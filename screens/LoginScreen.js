@@ -1,18 +1,29 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {useState} from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import React, {useState, useEffect} from 'react'
+import { KeyboardAvoidingView, StyleSheet, Text, View } from 'react-native'
 import {Button, Image, Input} from 'react-native-elements';
+import { auth } from '../firebase';
 
-const LoginScreen = () => {
+const LoginScreen = ({navigation}) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const signIn = () => {
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged(authUser => {
+            if (authUser) {
+                navigation.replace('Home');
+            }
+        })
+        return unsubscribe;
+    }, []);
 
+    const signIn = () => {
+        auth.signInWithEmailAndPassword(email, password)
+        .catch(error => alert(error.message));
     }
 
     return (
-        <View>
+        <KeyboardAvoidingView behavior='padding' style={styles.container}>
             <StatusBar style="light" />
             <Image 
                 source={{
@@ -31,11 +42,17 @@ const LoginScreen = () => {
                 <Input placeholder='Password' type='password' secureTextEntry 
                     value={password}
                     onChangeText={(text) => setPassword(text)}
+                    onSubmitEditing={signIn}
                 />
             </View>
-            <Button containerStyle={styles.button} title='Login' onPress={signIn} />
-            <Button containerStyle={styles.button} title='Register' type='outline' />
-        </View>
+            <Button containerStyle={styles.button} title='Login' 
+                onPress={signIn} 
+            />
+            <Button containerStyle={styles.button} title='Register' type='outline' 
+                onPress={() => navigation.navigate('Register')}
+            />
+            <View style={{height: 100}} />
+        </KeyboardAvoidingView>
         
     )
 }
@@ -43,6 +60,18 @@ const LoginScreen = () => {
 export default LoginScreen
 
 const styles = StyleSheet.create({
-    inputContainer: {},
-    button: {},
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 10,
+        backgroundColor: 'white',
+    },
+    inputContainer: {
+        width: 300,
+    },
+    button: {
+        width: 200,
+        marginTop: 10,
+    },
 })

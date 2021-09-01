@@ -1,2 +1,2 @@
-# Airbnb Clone
-This project is created using React JS, Next.js, Tailwind CSS, SSG, API, Date-Picker, Mapbox
+# Signal Clone
+A React Native application using Expo CLI, React Navigation, React Native Elements, Firebase
